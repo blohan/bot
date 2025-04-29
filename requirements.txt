@@ -1,0 +1,8 @@
+python-telegram-bot>=20.0
+google-generativeai>=0.3.0
+Pillow>=10.0.0
+python-dotenv>=1.0.0
+SQLAlchemy>=2.0.0
+psutil>=5.9.0
+pydub>=0.25.1
+uuid>=1.30 
