@@ -125,7 +125,7 @@ async def generate_image(prompt: str) -> tuple[str, bytes]:
         genai.configure(api_key=api_key)
         
         # Создаем клиента Gemini
-        client = genai.GenerativeModel('gemini-2.0-flash-exp-image-generation')
+        client = genai.GenerativeModel(GEMINI_IMAGE_MODEL)
         logging.info("Модель инициализирована")
         
         # Конфигурация для генерации
@@ -137,13 +137,21 @@ async def generate_image(prompt: str) -> tuple[str, bytes]:
         }
         
         # Формируем промпт для генерации
-        generation_prompt = f"""Generate a detailed image based on this description:
-        {prompt}
-        Style: high quality, detailed, photorealistic
-        Resolution: high resolution
-        Lighting: professional, balanced
-        Composition: well-composed, dynamic
-        Additional: sharp details, vivid colors"""
+        generation_prompt = {
+            "text": f"""Create a photorealistic image of {prompt}.
+            Requirements:
+            - High quality and detailed
+            - Photorealistic style
+            - Professional lighting
+            - Sharp details and vivid colors
+            - Well-composed scene
+            """,
+            "image_format": "png",
+            "size": {
+                "width": 1024,
+                "height": 1024
+            }
+        }
         
         logging.info(f"Отправляем запрос к API с промптом: {generation_prompt}")
         
@@ -168,6 +176,8 @@ async def generate_image(prompt: str) -> tuple[str, bytes]:
                             f.write(part.data)
                         logging.info(f"Изображение сохранено в {temp_path}")
                         return temp_path, part.data
+                    elif hasattr(part, 'text'):
+                        logging.error(f"API вернула текст вместо изображения: {part.text}")
                         
         logging.error(f"Не удалось получить изображение из ответа API")
         return None, None
